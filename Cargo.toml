@@ -2,6 +2,10 @@
 name = "octosurfer"
 version = "0.1.0"
 edition = "2021"
+authors = ["Tronje Krabbe"]
+documentation = "https://github.com/tronje/octosurfer"
+repository = "https://github.com/tronje/octosurfer"
+readme = "README.md"
 
 [dependencies]
 anyhow = "1.0.69"
