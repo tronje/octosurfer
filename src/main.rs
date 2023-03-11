@@ -16,7 +16,7 @@ use tokio::process::Command;
 use tokio::task::JoinHandle;
 use url::Url;
 
-/// Clone all GitHub repositories matching a query
+/// Clone all GitHub repositories matching a query and search them
 #[derive(FromArgs)]
 pub struct OctoSurfer {
     /// keywords to use when searching for repos (comma-separated)
