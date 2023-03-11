@@ -5,10 +5,12 @@ it for a list of terms.
 
 ## Installation
 
-- Make sure you have a working Rust toolchain installed.
-- `cargo install --git https://github.com/tronje/octosurfer`
+This project is published on [crates.io](https://crates.io/crates/octosurfer).
+Make sure you have a working Rust toolchain installed, then install with `cargo`:
 
-This project may be published to crates.io in the future, but hasn't yet.
+```console
+$ cargo install octosurfer
+```
 
 ## Usage
 
