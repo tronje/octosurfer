@@ -10,6 +10,7 @@ use argh::FromArgs;
 use chrono::TimeZone;
 use octocrab::models::Repository;
 use octocrab::Octocrab;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tokio::process::Command;
@@ -147,6 +148,7 @@ struct Runner {
     cli_app: OctoSurfer,
     octocrab: Octocrab,
     code_queries: CodeQueries,
+    rm_paths: HashSet<PathBuf>,
 }
 
 impl Runner {
@@ -185,12 +187,22 @@ impl Runner {
     }
 
     async fn handle_page(
-        &self,
+        &mut self,
         repos: Vec<Repository>,
     ) -> Result<Vec<JoinHandle<Result<QueryResults>>>> {
         let mut handles = Vec::with_capacity(repos.len());
 
         for repo in repos {
+            if self.cli_app.rm {
+                let owner = &repo
+                    .owner
+                    .as_ref()
+                    .ok_or_else(|| anyhow!("Repo without an owner!"))?
+                    .login;
+                let rm_path = self.cli_app.target_dir.join(owner);
+                self.rm_paths.insert(rm_path);
+            }
+
             let handle = tokio::spawn(handle_repo(
                 repo,
                 self.cli_app.target_dir.clone(),
@@ -256,6 +268,15 @@ impl Runner {
         aggregator.write(&self.cli_app.out_file).await?;
         log::info!("Wrote results to {:?}", self.cli_app.out_file);
 
+        // Repos are cloned to {target_dir}/{owner}/{repo}, and when they are removed after
+        // searching, {target_dir}/{owner} remains! So clean that up here.
+        if self.cli_app.rm {
+            for path in self.rm_paths.iter() {
+                log::info!("Removing {}", path.display());
+                tokio::fs::remove_dir(path).await?;
+            }
+        }
+
         Ok(())
     }
 }
@@ -279,6 +300,7 @@ async fn main() -> Result<()> {
         cli_app,
         octocrab,
         code_queries,
+        rm_paths: HashSet::new(),
     };
 
     runner.run().await
