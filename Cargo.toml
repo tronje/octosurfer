@@ -1,6 +1,6 @@
 [package]
 name = "octosurfer"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Tronje Krabbe"]
 description = "Search GitHub, clone matching repos, and search through the repos."
