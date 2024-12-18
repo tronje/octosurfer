@@ -152,8 +152,9 @@ struct Runner {
 }
 
 impl Runner {
-    async fn wait_for_reset(&self, reset_ts: usize) -> Result<()> {
-        let reset = chrono::Utc.timestamp_opt(reset_ts as i64, 0).unwrap();
+    async fn wait_for_reset(&self, reset_ts: u64) -> Result<()> {
+        let reset_ts = reset_ts.try_into()?;
+        let reset = chrono::Utc.timestamp_opt(reset_ts, 0).unwrap();
         let now = chrono::Utc::now();
 
         if reset > now {
